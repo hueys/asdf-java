@@ -15,7 +15,7 @@ jobs:
     env:
       TERM: dumb
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: mstksg/get-package@v1
       with:
         brew: bash coreutils jq shellcheck
@@ -26,7 +26,7 @@ jobs:
         shellcheck ./bin/functions
         shellcheck ./update_data.bash
     - name: Install asdf
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: asdf-vm/asdf
         path: asdf
