@@ -59,6 +59,8 @@ If you just want the latest of a major version (without worrying about the patch
 asdf install java latest:temurin-11
 ```
 
+Without a query, `asdf install java latest` (and `asdf latest java`) resolves to the latest plain JDK build, excluding `jre`/`musl`/etc. variants.
+
 Similarly, you can set the global/local version. The latest tag will resolve to the most recent version.
 
 Running `asdf local java latest:temurin-11` will result in the following:
