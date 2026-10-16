@@ -133,6 +133,38 @@ function list-all() {
     cut -d $'\t' -f 1 "${CACHE_DIR}/releases-${OS}-${ARCHITECTURE}.tsv" | uniq | tr '\n' ' '
 }
 
+function latest-stable() {
+    local query="${1:-}"
+    local -a all_versions candidates
+    local version
+
+    retrieve-release-data
+    mapfile -t all_versions < <(cut -d $'\t' -f 1 "${CACHE_DIR}/releases-${OS}-${ARCHITECTURE}.tsv" | uniq)
+
+    candidates=()
+    for version in "${all_versions[@]}"; do
+        if [[ "${version}" =~ -(alpha|beta|rc|milestone|pre|snapshot)([.-]|$) ]]; then
+            continue
+        fi
+
+        if [[ -n "${query}" ]]; then
+            [[ "${version}" == "${query}"* ]] || continue
+        else
+            # Default to a plain JDK build, excluding jre/musl/javafx/etc. variants
+            [[ "${version}" =~ ^temurin-[0-9] ]] || continue
+        fi
+
+        candidates+=("${version}")
+    done
+
+    if [[ ${#candidates[@]} -eq 0 ]]; then
+        echo "No stable version found${query:+ matching \"${query}\"}" >&2
+        exit 1
+    fi
+
+    echo "${candidates[-1]}"
+}
+
 function list-legacy-filenames() {
     echo ".java-version"
 }
@@ -267,6 +299,8 @@ function absolute_dir_path {
 case "$(basename "${0}")" in
     list-all) list-all
               ;;
+    latest-stable) latest-stable "$1"
+                   ;;
     list-legacy-filenames) list-legacy-filenames
                            ;;
     install) install
