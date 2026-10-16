@@ -47,6 +47,8 @@ jobs:
         asdf install java "temurin-21.0.8+9.0.LTS"
         asdf set java "temurin-21.0.8+9.0.LTS"
         asdf exec java -version
+        asdf latest java | grep -q "^temurin-[0-9]"
+        asdf latest java temurin-11 | grep -q "^temurin-11\."
     - name: Check update_data.bash
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
