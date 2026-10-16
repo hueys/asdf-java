@@ -30,13 +30,6 @@ jobs:
       with:
         repository: asdf-vm/asdf
         path: asdf
-    - name: Debug workspace
-      run: |
-        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-        pwd
-        ls -la
-        ls -la asdf || echo "asdf dir missing"
-        ls -la asdf/asdf.sh || echo "asdf.sh missing"
     - name: Run tests
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
