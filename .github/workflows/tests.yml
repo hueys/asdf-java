@@ -26,16 +26,27 @@ jobs:
         shellcheck ./bin/functions
         shellcheck ./update_data.bash
     - name: Install asdf
-      uses: actions/checkout@v4
-      with:
-        repository: asdf-vm/asdf
-        path: asdf
+      run: |
+        ASDF_VERSION=v0.20.2
+        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        case "${ARCH}" in
+            x86_64) ARCH=amd64 ;;
+            aarch64|arm64) ARCH=arm64 ;;
+        esac
+        curl -sSL -o asdf.tar.gz "https://github.com/asdf-vm/asdf/releases/download/${ASDF_VERSION}/asdf-${ASDF_VERSION}-${OS}-${ARCH}.tar.gz"
+        tar xzf asdf.tar.gz
+        sudo mv asdf /usr/local/bin/asdf
+        rm asdf.tar.gz
+        asdf version
     - name: Run tests
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        . asdf/asdf.sh
-        asdf plugin-test java "$GITHUB_WORKSPACE" --asdf-plugin-gitref "$GITHUB_SHA" --asdf-tool-version "temurin-21.0.8+9.0.LTS" java -version
+        asdf plugin add java "$GITHUB_WORKSPACE"
+        asdf install java "temurin-21.0.8+9.0.LTS"
+        asdf set java "temurin-21.0.8+9.0.LTS"
+        asdf exec java -version
     - name: Check update_data.bash
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +66,6 @@ jobs:
       run: |
         export ASDF_CONFIG_FILE=${HOME}"/.asdfrc"
         echo "java_macos_integration_enable = yes" > "${ASDF_CONFIG_FILE}"
-        . asdf/asdf.sh
-        asdf plugin-test java "$GITHUB_WORKSPACE" --asdf-plugin-gitref "$GITHUB_SHA" --asdf-tool-version "temurin-8.0.504+1" /usr/libexec/java_home -V 2>&1 | grep "Eclipse Adoptium"
+        asdf install java "temurin-8.0.504+1"
+        /usr/libexec/java_home -V 2>&1 | grep "Eclipse Adoptium"
       if: matrix.os == 'macOS-latest'
