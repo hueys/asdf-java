@@ -66,6 +66,6 @@ jobs:
       run: |
         export ASDF_CONFIG_FILE=${HOME}"/.asdfrc"
         echo "java_macos_integration_enable = yes" > "${ASDF_CONFIG_FILE}"
-        asdf install java "temurin-8.0.504+1"
+        asdf install java "temurin-21.0.8+9.0.LTS"
         /usr/libexec/java_home -V 2>&1 | grep "Eclipse Adoptium"
       if: matrix.os == 'macOS-latest'
