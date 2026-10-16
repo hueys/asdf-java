@@ -15,7 +15,7 @@ jobs:
     env:
       TERM: dumb
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: mstksg/get-package@v1
       with:
         brew: bash coreutils jq shellcheck
@@ -26,39 +26,46 @@ jobs:
         shellcheck ./bin/functions
         shellcheck ./update_data.bash
     - name: Install asdf
-      uses: actions/checkout@v2
-      with:
-        repository: asdf-vm/asdf
-        path: asdf
+      run: |
+        ASDF_VERSION=v0.20.2
+        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        case "${ARCH}" in
+            x86_64) ARCH=amd64 ;;
+            aarch64|arm64) ARCH=arm64 ;;
+        esac
+        curl -sSL -o asdf.tar.gz "https://github.com/asdf-vm/asdf/releases/download/${ASDF_VERSION}/asdf-${ASDF_VERSION}-${OS}-${ARCH}.tar.gz"
+        tar xzf asdf.tar.gz
+        sudo mv asdf /usr/local/bin/asdf
+        rm asdf.tar.gz
+        asdf version
     - name: Run tests
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        . asdf/asdf.sh
-        asdf plugin-test java "$GITHUB_WORKSPACE" --asdf-plugin-gitref "$GITHUB_SHA" --asdf-tool-version zulu-21.28.85 java -version
+        asdf plugin add java "$GITHUB_WORKSPACE"
+        asdf install java "temurin-21.0.8+9.0.LTS"
+        asdf set java "temurin-21.0.8+9.0.LTS"
+        asdf exec java -version
     - name: Check update_data.bash
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         ./update_data.bash
-        grep -q adoptopenjdk-openj9-11 data/jdk-linux-x86_64.tsv
-        echo "Found adoptopenjdk-openj9-11"
-        grep -q adoptopenjdk-openj9-large_heap-11 data/jdk-macosx-x86_64.tsv
-        echo "Found adoptopenjdk-openj9-large_heap-11"
-        grep -q zulu-musl-11 data/jdk-linux-x86_64.tsv
-        echo "Found zulu-musl-11 "
-        grep -q liberica-javafx-16 data/jdk-linux-arm32-vfp-hflt.tsv
-        echo "Found liberica-javafx-16"
-        grep -q liberica-lite-11 data/jdk-macosx-x86_64.tsv
-        echo "Found liberica-lite-11"
-        grep "graalvm-21" data/jdk-linux-aarch64.tsv | grep -q -v "graalvm-graalvm-21"
-        echo "Found graalvm-21"
+        grep -q "^temurin-11\." data/jdk-linux-x86_64.tsv
+        echo "Found temurin-11"
+        grep -q "^temurin-jre-11\." data/jdk-macosx-x86_64.tsv
+        echo "Found temurin-jre-11"
+        grep -q "^temurin-musl-11\." data/jdk-linux-x86_64.tsv
+        echo "Found temurin-musl-11"
+        ! grep -qi "adoptopenjdk\|zulu\|liberica\|graalvm\|corretto" data/jdk-linux-x86_64.tsv
+        echo "Confirmed only temurin releases are present"
     - name: macOS Check java_home integration
       env:
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         export ASDF_CONFIG_FILE=${HOME}"/.asdfrc"
         echo "java_macos_integration_enable = yes" > "${ASDF_CONFIG_FILE}"
-        . asdf/asdf.sh
-        asdf plugin-test java "$GITHUB_WORKSPACE" --asdf-plugin-gitref "$GITHUB_SHA" --asdf-tool-version zulu-8.52.0.23 /usr/libexec/java_home -V 2>&1 | grep "Zulu 8.52.0.23"
+        asdf install java "temurin-21.0.8+9.0.LTS"
+        /usr/libexec/java_home -V 2>&1 | grep "Eclipse Adoptium"
       if: matrix.os == 'macOS-latest'

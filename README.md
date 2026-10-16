@@ -23,6 +23,8 @@ asdf plugin add java https://github.com/halcyon/asdf-java.git
 
 Check [asdf](https://asdf-vm.github.io/asdf/) for instructions on how to install & manage versions of Java.
 
+_Note: this plugin only offers [Eclipse Temurin](https://adoptium.net/temurin/) builds._
+
 ## Install
 
 List candidate JDKs:
@@ -34,7 +36,7 @@ asdf list all java
 Install a candidate listed from the previous command like this:
 
 ```
-asdf install java adoptopenjdk-11.0.16+8
+asdf install java temurin-11.0.16+8
 ```
 
 ### Setting a version
@@ -42,11 +44,11 @@ asdf install java adoptopenjdk-11.0.16+8
 Select an installed candidate for use like this:
 
 ```
-asdf set -u java adoptopenjdk-11.0.16+8
+asdf set -u java temurin-11.0.16+8
 ```
 or just for the local directory
 ```
-asdf set java adoptopenjdk-11.0.16+8
+asdf set java temurin-11.0.16+8
 ```
 
 ### Latest
@@ -54,16 +56,16 @@ asdf set java adoptopenjdk-11.0.16+8
 If you just want the latest of a major version (without worrying about the patch number), install it like this:
 
 ```
-asdf install java latest:adoptopenjdk-11
+asdf install java latest:temurin-11
 ```
 
 Similarly, you can set the global/local version. The latest tag will resolve to the most recent version.
 
-Running `asdf local java latest:adoptopenjdk-11` will result in the following:
+Running `asdf local java latest:temurin-11` will result in the following:
 
 ```shell
 $ cat .tool-versions
-java adoptopenjdk-11.0.16+8
+java temurin-11.0.16+8
 ```
 
 ### Early Access builds
@@ -115,7 +117,7 @@ Setting `java_macos_integration_enable` to yes on `.asdfrc` file enables this in
 java_macos_integration_enable=yes
 ```
 
-_Note: Not all distributions of Java JDK packages offer this integration (e.g. liberica). This option only works for packages that **do offer** that integration._
+_Note: Temurin packages offer this integration._
 
 ### Apple Silicon integration
 
