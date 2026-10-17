@@ -3,13 +3,17 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '30 */8 * * *'
+permissions:
+  contents: write
 jobs:
   update:
     if: github.repository == 'hueys/asdf-java'
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v2
-    - uses: mstksg/get-package@v1
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      with:
+        persist-credentials: false
+    - uses: mstksg/get-package@4eda30bb5c6ac62c0f3921dd5884b6ef8fc89ab2 # v1
       with:
         apt-get: curl
     - name: Install jq 1.6
@@ -31,6 +35,6 @@ jobs:
         git clean -f
         git commit -m "Update Java release data" || true
     - name: Push changes
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c # v1.3.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
