@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
     - master
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -15,8 +17,10 @@ jobs:
     env:
       TERM: dumb
     steps:
-    - uses: actions/checkout@v4
-    - uses: mstksg/get-package@v1
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
+    - uses: mstksg/get-package@4eda30bb5c6ac62c0f3921dd5884b6ef8fc89ab2 # v1
       with:
         brew: bash coreutils jq shellcheck
         apt-get: jq shellcheck
@@ -25,6 +29,13 @@ jobs:
         shellcheck -V
         shellcheck ./bin/functions
         shellcheck ./update_data.bash
+    - name: Run zizmor
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        pip install "zizmor==1.31.1"
+        zizmor --format=github .github/workflows/
     - name: Install asdf
       run: |
         ASDF_VERSION=v0.20.2
