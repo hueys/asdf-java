@@ -20,10 +20,12 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         persist-credentials: false
-    - uses: mstksg/get-package@4eda30bb5c6ac62c0f3921dd5884b6ef8fc89ab2 # v1
-      with:
-        brew: bash coreutils jq shellcheck
-        apt-get: jq shellcheck
+    - name: Install dependencies
+      run: |
+        case "$(uname -s)" in
+            Darwin) brew install bash coreutils jq shellcheck ;;
+            Linux) sudo apt-get update && sudo apt-get install -y jq shellcheck ;;
+        esac
     - name: Run ShellCheck
       run: |
         shellcheck -V
