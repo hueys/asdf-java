@@ -5,6 +5,14 @@
 
 [Java](https://www.java.com/en/) plugin for the [asdf](https://github.com/asdf-vm/asdf) version manager.
 
+## About this fork
+
+This is a personal fork of [halcyon/asdf-java](https://github.com/halcyon/asdf-java), the original plugin. Changes from upstream:
+
+- **Temurin only.** `asdf list all java` / `asdf install java` only offer [Eclipse Temurin](https://adoptium.net/temurin/) builds, instead of upstream's full multi-vendor list (adoptopenjdk, zulu, liberica, graalvm, corretto, etc.).
+- **`asdf latest java` works.** Upstream has no `bin/latest-stable`, so `asdf latest java` / `asdf install java latest` (no query) fail outright on it — asdf core's fallback requires version strings to start with a digit, and every version this plugin lists is vendor-prefixed. This fork implements it.
+- **CI hardened.** GitHub Actions workflows are scanned with [zizmor](https://docs.zizmor.sh/) and all third-party actions are pinned to commit SHAs; [Dependabot](https://docs.github.com/en/code-security/dependabot) keeps those pins up to date.
+
 ## Requirements
 - [bash v5.0](https://www.gnu.org/software/bash/)
 - [curl](https://curl.haxx.se/)
