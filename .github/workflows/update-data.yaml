@@ -2,7 +2,7 @@ name: Update Java release data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 */8 * * *'
+    - cron: '30 4 * * *'
 permissions:
   contents: write
 jobs:
@@ -26,14 +26,23 @@ jobs:
       run: |
         export PATH=".:$PATH"
         ./update_data.bash
-    - name: Commit files
+    - name: Open pull request
+      env:
+        GH_TOKEN: ${{ secrets.UPDATE_TOKEN }}
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
         git add data/*.tsv
         git clean -f
-        git commit -m "Update Java release data" || true
-    - name: Push changes
-      uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c # v1.3.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        if git diff --cached --quiet; then
+          echo "No changes to Java release data"
+          exit 0
+        fi
+        branch="update-data-$(date -u +%Y%m%d%H%M)"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git checkout -b "$branch"
+        git commit -m "Update Java release data"
+        git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
+        gh pr create --base master --head "$branch" \
+          --title "Update Java release data" \
+          --body "Automated update from the scheduled workflow."
+        gh pr merge "$branch" --rebase --auto --delete-branch
