@@ -37,12 +37,12 @@ jobs:
           exit 0
         fi
         branch="update-data-$(date -u +%Y%m%d%H%M)"
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
         git checkout -b "$branch"
         git commit -m "Update Java release data"
         git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$branch"
         gh pr create --base master --head "$branch" \
           --title "Update Java release data" \
           --body "Automated update from the scheduled workflow."
-        gh pr merge "$branch" --squash --auto --delete-branch
+        gh pr merge "$branch" --rebase --auto --delete-branch
