@@ -18,7 +18,7 @@ This is a personal fork of [halcyon/asdf-java](https://github.com/halcyon/asdf-j
 - [curl](https://curl.haxx.se/)
 - [sha256sum](https://www.gnu.org/software/coreutils/) (only on Linux)
 - [unzip](http://infozip.sourceforge.net/UnZip.html)
-- [jq](https://stedolan.github.io/jq/) (only for updating the release data)
+- [jq](https://jqlang.github.io/jq/) (only for updating the release data)
 
 ## Install
 

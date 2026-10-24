@@ -17,7 +17,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y curl
     - name: Install jq 1.6
       run: |
-        curl -Lo jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        curl -Lo jq https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64
         chmod +x jq
         jq --version
     - name: Run update script
